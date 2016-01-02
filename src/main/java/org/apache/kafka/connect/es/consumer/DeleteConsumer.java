@@ -31,11 +31,13 @@ public class DeleteConsumer extends AbstractConsumer {
         boolean successful = false;
 
         JsonNode tree = null;
-        try {
-            tree = reader.readTree(new ByteArrayInputStream(data));
-        } catch (IOException e) {
-            if (log.isErrorEnabled()) {
-                log.error("Error converting to JsonNode", e);
+        if (data != null) {
+            try {
+                tree = reader.readTree(new ByteArrayInputStream(data));
+            } catch (IOException e) {
+                if (log.isErrorEnabled()) {
+                    log.error("Error converting to JsonNode", e);
+                }
             }
         }
 

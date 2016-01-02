@@ -12,7 +12,11 @@ public class IndexConsumer extends AbstractConsumer {
 
     @Override
     protected boolean addRequestToBulkProcessor(BulkProcessor processor, byte[] data) {
-        processor.add(Requests.indexRequest(config.getIndexName()).type(config.getTypeName()).source(data));
-        return true;
+        boolean success = false;
+        if (data != null) {
+            processor.add(Requests.indexRequest(config.getIndexName()).type(config.getTypeName()).source(data));
+            success = true;
+        }
+        return success;
     }
 }

@@ -77,11 +77,11 @@ final class ElasticSearchClient {
     private Dcl<Client> client = Factory.of(() -> {
         Settings settings = Settings.settingsBuilder().put("cluster.name", config.getString(ES_CLUSTER_NAME)).build();
         //@formatter:off
-		return TransportClient.builder()
-				              .settings(settings)
-				              .build()
-				              .addTransportAddresses(toTransportAddresses(config.getList(ES_CLUSTER)));
-		//@formatter:on
+        return TransportClient.builder()
+                              .settings(settings)
+                              .build()
+                              .addTransportAddresses(toTransportAddresses(config.getList(ES_CLUSTER)));
+        //@formatter:on
     });
 
     private AtomicInteger counter = new AtomicInteger();
@@ -164,7 +164,7 @@ final class ElasticSearchClient {
                 } finally {
                     semaphore.release();
                 }
-                if (requests != null) {
+                if (!(requests == null || requests.isEmpty())) {
                     BulkProcessor bulkProcessor = getBulkProcessor();
                     for (ActionRequest request : requests) {
                         bulkProcessor.add(request);
