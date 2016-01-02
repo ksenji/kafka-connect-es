@@ -30,7 +30,7 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
     private static final String TYPE_DOC = "The mapping type of elasticsearch index. Default is: status";
 
     public static final String BULK_SIZE = "bulk.size";
-    private static final String BULK_SIZE_DOC = "The number of messages to be bulk indexed into elasticsearch. Default is: 100";
+    private static final String BULK_SIZE_DOC = "The number of messages to be bulk indexed into elasticsearch. Default is: 1000";
 
     public static final String ACTION_TYPE = "action.type";
     private static final String ACTION_TYPE_DOC = "The action type against how the messages should be processed. Default is: index. The following options are available: "
@@ -43,15 +43,15 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
     static ConfigDef config = new ConfigDef().define(ES_CLUSTER, Type.LIST, "localhost:9300", Importance.HIGH, ES_CLUSTER_DOC)
             .define(ES_CLUSTER_NAME, Type.STRING, "elasticsearch", Importance.HIGH, ES_CLUSTER_NAME_DOC)
             .define(INDEX, Type.STRING, "kafka-index", Importance.HIGH, INDEX_DOC).define(TYPE, Type.STRING, "status", Importance.HIGH, TYPE_DOC)
-            .define(BULK_SIZE, Type.INT, 100, Importance.HIGH, BULK_SIZE_DOC)
+            .define(BULK_SIZE, Type.INT, 1000, Importance.HIGH, BULK_SIZE_DOC)
             .define(ACTION_TYPE, Type.STRING, "index", Importance.HIGH, ACTION_TYPE_DOC)
             .define(ES_CONVERTER_CLASS_CONFIG, Type.CLASS, Importance.MEDIUM, ES_CONVERTER_CLASS_DOC);
 
-//    private Map<String, String> originals;
+    // private Map<String, String> originals;
 
     public ElasticSearchSinkConnectorConfig(Map<String, String> props) {
         super(config, props);
-//        this.originals = props;
+        // this.originals = props;
     }
 
     public enum ActionType {
@@ -93,6 +93,10 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
 
     public String getTypeName() {
         return getString(TYPE);
+    }
+
+    public Integer getBulkSize() {
+        return getInt(BULK_SIZE);
     }
 
     private Dcl<Converter> converter = Factory.of(() -> {

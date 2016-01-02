@@ -129,7 +129,7 @@ final class ElasticSearchClient {
             }
         });
 
-        return builder.setConcurrentRequests(1).build();
+        return builder.setBulkActions(config.getBulkSize()).setConcurrentRequests(1).build();
     });
 
     Client getClient() {
