@@ -1,28 +1,34 @@
 package org.apache.kafka.connect.es.consumer;
 
-import java.util.function.Consumer;
+//import java.util.function.Consumer;
 
 import org.apache.kafka.connect.es.config.ElasticSearchSinkConnectorConfig;
+import org.apache.kafka.connect.es.converter.Converter;
 import org.apache.kafka.connect.sink.SinkRecord;
-import org.apache.kafka.connect.storage.Converter;
 import org.elasticsearch.action.bulk.BulkProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractConsumer implements Consumer<SinkRecord> {
 
-	protected ElasticSearchSinkConnectorConfig config;
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
-	public AbstractConsumer(ElasticSearchSinkConnectorConfig config) {
-		this.config = config;
-	}
+    protected ElasticSearchSinkConnectorConfig config;
+    protected BulkProcessor bulkProcessor;
 
-	@Override
-	public void accept(SinkRecord record) {
-		Converter converter = config.getValueConverter();
-		byte[] data = converter.fromConnectData(record.topic(), record.valueSchema(), record.value());
+    public AbstractConsumer(ElasticSearchSinkConnectorConfig config, BulkProcessor bulkProcessor) {
+        this.config = config;
+        this.bulkProcessor = bulkProcessor;
+    }
 
-		addRequestToBulkProcessor(config.getEsBulkProcessor(), data);
-	}
+    @Override
+    public boolean process(SinkRecord record) {
+        Converter converter = config.getConverter();
+        byte[] data = converter.serialize(record);
 
-	protected abstract void addRequestToBulkProcessor(BulkProcessor processor, byte[] data);
+        return addRequestToBulkProcessor(bulkProcessor, data);
+    }
+
+    protected abstract boolean addRequestToBulkProcessor(BulkProcessor processor, byte[] data);
 
 }

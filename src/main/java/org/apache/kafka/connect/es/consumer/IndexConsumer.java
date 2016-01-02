@@ -6,12 +6,13 @@ import org.elasticsearch.client.Requests;
 
 public class IndexConsumer extends AbstractConsumer {
 
-	public IndexConsumer(ElasticSearchSinkConnectorConfig config) {
-		super(config);
-	}
+    public IndexConsumer(ElasticSearchSinkConnectorConfig config, BulkProcessor bulkProcessor) {
+        super(config, bulkProcessor);
+    }
 
-	@Override
-	protected void addRequestToBulkProcessor(BulkProcessor processor, byte[] data) {
-		processor.add(Requests.indexRequest(config.getIndexName()).type(config.getTypeName()).source(data));
-	}
+    @Override
+    protected boolean addRequestToBulkProcessor(BulkProcessor processor, byte[] data) {
+        processor.add(Requests.indexRequest(config.getIndexName()).type(config.getTypeName()).source(data));
+        return true;
+    }
 }
