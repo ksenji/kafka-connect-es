@@ -105,13 +105,18 @@ final class ElasticSearchClient {
                     List<ActionRequest> requests = requestsOf(request);
                     BulkItemResponse[] items = response.getItems();
 
+                    int done = 0;
                     for (int i = 0; i < items.length; i++) {
                         BulkItemResponse item = items[i];
                         if (item.isFailed()) {
                             failedRequests.add(requests.get(i));
                         } else {
-                            counter.decrementAndGet();
+                            done++;
                         }
+                    }
+
+                    if (done > 0) {
+                        updatePendingRequests(-done);
                     }
                 }
                 semaphore.release();
