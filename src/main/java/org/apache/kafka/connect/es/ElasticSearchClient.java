@@ -153,6 +153,7 @@ final class ElasticSearchClient {
             /* ensure no requests are pending */
             semaphore.acquireUninterruptibly();
             if (counter.get() > 0) {
+                BulkProcessor bulkProcessor = getBulkProcessor();
                 List<ActionRequest> requests = null;
                 try {
                     /*
@@ -165,12 +166,11 @@ final class ElasticSearchClient {
                     semaphore.release();
                 }
                 if (!(requests == null || requests.isEmpty())) {
-                    BulkProcessor bulkProcessor = getBulkProcessor();
                     for (ActionRequest request : requests) {
                         bulkProcessor.add(request);
                     }
-                    bulkProcessor.flush();
                 }
+                bulkProcessor.flush();
             } else {
                 semaphore.release();
                 break;
