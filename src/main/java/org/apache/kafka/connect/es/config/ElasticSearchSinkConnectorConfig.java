@@ -34,18 +34,18 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
 
     public static final String ACTION_TYPE = "action.type";
     private static final String ACTION_TYPE_DOC = "The action type against how the messages should be processed. Default is: index. The following options are available: "
-            + "index : Creates documents in ES with the value field set to the received message. "
-            + "delete : Deletes documents from ES based on id field set in the received message. ";
+        + "index : Creates documents in ES with the value field set to the received message. "
+        + "delete : Deletes documents from ES based on id field set in the received message. ";
 
     public static final String ES_CONVERTER_CLASS_CONFIG = "es.converter";
     private static final String ES_CONVERTER_CLASS_DOC = "Converter class that converts Connect data to ES format.";
 
-    static ConfigDef config = new ConfigDef().define(ES_CLUSTER, Type.LIST, "localhost:9300", Importance.HIGH, ES_CLUSTER_DOC)
-            .define(ES_CLUSTER_NAME, Type.STRING, "elasticsearch", Importance.HIGH, ES_CLUSTER_NAME_DOC)
-            .define(INDEX, Type.STRING, "kafka-index", Importance.HIGH, INDEX_DOC).define(TYPE, Type.STRING, "status", Importance.HIGH, TYPE_DOC)
-            .define(BULK_SIZE, Type.INT, 1000, Importance.HIGH, BULK_SIZE_DOC)
-            .define(ACTION_TYPE, Type.STRING, "index", Importance.HIGH, ACTION_TYPE_DOC)
-            .define(ES_CONVERTER_CLASS_CONFIG, Type.CLASS, Importance.MEDIUM, ES_CONVERTER_CLASS_DOC);
+    public static ConfigDef config = new ConfigDef().define(ES_CLUSTER, Type.LIST, "localhost:9300", Importance.HIGH, ES_CLUSTER_DOC)
+        .define(ES_CLUSTER_NAME, Type.STRING, "elasticsearch", Importance.HIGH, ES_CLUSTER_NAME_DOC)
+        .define(INDEX, Type.STRING, "kafka-index", Importance.HIGH, INDEX_DOC).define(TYPE, Type.STRING, "status", Importance.HIGH, TYPE_DOC)
+        .define(BULK_SIZE, Type.INT, 1000, Importance.HIGH, BULK_SIZE_DOC)
+        .define(ACTION_TYPE, Type.STRING, "index", Importance.HIGH, ACTION_TYPE_DOC)
+        .define(ES_CONVERTER_CLASS_CONFIG, Type.CLASS, Importance.MEDIUM, ES_CONVERTER_CLASS_DOC);
 
     // private Map<String, String> originals;
 

@@ -30,7 +30,24 @@ public class InMemoryTopology {
     });
 
     private Dcl<KafkaServerStartable> broker = Factory.of(() -> {
-        Properties props = TestUtils.createBrokerConfig(1, zkTestServer.get().getConnectString(), true, false, 9092, Option.empty(), Option.empty(), true, false, 0, false, 0, false, 0);
+        Properties props = TestUtils.createBrokerConfig(
+            1,
+            zkTestServer.get().getConnectString(),
+            true,
+            false,
+            9092,
+            Option.empty(),
+            Option.empty(),
+            Option.empty(),
+            true,
+            false,
+            0,
+            false,
+            0,
+            false,
+            0,
+            Option.empty());
+
         KafkaServerStartable kss = new KafkaServerStartable(new KafkaConfig(props));
         kss.startup();
 
@@ -39,13 +56,13 @@ public class InMemoryTopology {
 
     private Dcl<Node> es = Factory.of(() -> {
         Settings settings = Settings.settingsBuilder()
-                                    .put("http.enabled", "true")
-                                    .put("node.master", "true")
-                                    .put("http.port", 9201)
-                                    .put("transport.tcp.port", 9301)
-                                    .put("path.data", "/tmp/es/data")
-                                    .put("path.home", "/tmp/es")
-                                    .build();
+            .put("http.enabled", "true")
+            .put("node.master", "true")
+            .put("http.port", 9201)
+            .put("transport.tcp.port", 9301)
+            .put("path.data", "/tmp/es/data")
+            .put("path.home", "/tmp/es")
+            .build();
 
         return NodeBuilder.nodeBuilder().client(false).clusterName("elasticsearch").data(true).settings(settings).build().start();
     });
@@ -61,7 +78,7 @@ public class InMemoryTopology {
     public Node getEsNode() {
         return es.get();
     }
-    
+
     public void shutdown() {
         try {
             FileUtils.deleteDirectory(new File("/tmp/es/data"));

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.errors.ConnectException;
@@ -21,13 +22,19 @@ public class ElasticSearchSinkConnector extends SinkConnector {
 	}
 
 	@Override
-	public void start(Map<String, String> props) {
+	public void start(Map<String, String> props)
+	{
 		this.configProperties = props;
 		try {
 			new ElasticSearchSinkConnectorConfig(props);
 		} catch (ConfigException e) {
 			throw new ConnectException("Couldn't start " + getClass().getName() + " due to configuration error.", e);
 		}
+	}
+
+	@Override
+	public ConfigDef config() {
+		return ElasticSearchSinkConnectorConfig.config;
 	}
 
 	@Override
