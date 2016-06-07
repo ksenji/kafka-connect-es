@@ -2,6 +2,9 @@ package org.apache.kafka.connect.es.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
@@ -10,6 +13,7 @@ import org.apache.kafka.common.config.ConfigDef.Type;
 import org.apache.kafka.connect.es.converter.Converter;
 import org.apache.kafka.connect.es.dcl.Factory;
 import org.apache.kafka.connect.es.dcl.Factory.Dcl;
+import org.apache.kafka.connect.sink.SinkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +44,17 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
     public static final String ES_CONVERTER_CLASS_CONFIG = "es.converter";
     private static final String ES_CONVERTER_CLASS_DOC = "Converter class that converts Connect data to ES format.";
 
-    public static ConfigDef config = new ConfigDef().define(ES_CLUSTER, Type.LIST, "localhost:9300", Importance.HIGH, ES_CLUSTER_DOC)
+    public static final String DOC_ID_GETTER_CLASS_CONFIG = "doc.id.getter";
+    public static final String DOC_ID_GETTER_CLASS_DOC = "Class that can return an ID for a document";
+
+    public static ConfigDef config = new ConfigDef()
+        .define(ES_CLUSTER, Type.LIST, "localhost:9300", Importance.HIGH, ES_CLUSTER_DOC)
         .define(ES_CLUSTER_NAME, Type.STRING, "elasticsearch", Importance.HIGH, ES_CLUSTER_NAME_DOC)
         .define(INDEX, Type.STRING, "kafka-index", Importance.HIGH, INDEX_DOC).define(TYPE, Type.STRING, "status", Importance.HIGH, TYPE_DOC)
         .define(BULK_SIZE, Type.INT, 1000, Importance.HIGH, BULK_SIZE_DOC)
         .define(ACTION_TYPE, Type.STRING, "index", Importance.HIGH, ACTION_TYPE_DOC)
-        .define(ES_CONVERTER_CLASS_CONFIG, Type.CLASS, Importance.MEDIUM, ES_CONVERTER_CLASS_DOC);
+        .define(ES_CONVERTER_CLASS_CONFIG, Type.CLASS, Importance.MEDIUM, ES_CONVERTER_CLASS_DOC)
+        .define(DOC_ID_GETTER_CLASS_CONFIG, Type.CLASS, Importance.LOW, DOC_ID_GETTER_CLASS_DOC);
 
     // private Map<String, String> originals;
 
@@ -102,7 +111,8 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
     private Dcl<Converter> converter = Factory.of(() -> {
         Converter converter = null;
         try {
-            Class<? extends Converter> klass = ElasticSearchSinkConnectorConfig.this.getClass(ES_CONVERTER_CLASS_CONFIG).asSubclass(Converter.class);
+            Class<? extends Converter> klass =
+                ElasticSearchSinkConnectorConfig.this.getClass(ES_CONVERTER_CLASS_CONFIG).asSubclass(Converter.class);
             if (klass != null) {
                 converter = klass.newInstance();
             }
@@ -116,4 +126,23 @@ public class ElasticSearchSinkConnectorConfig extends AbstractConfig {
     public Converter getConverter() {
         return converter.get();
     }
+
+    private Dcl<Optional<Function<SinkRecord, String>>> docIdGetter = Factory.of( () ->
+    {
+        Optional<Function<SinkRecord, String>> rv = Optional.empty();
+        try {
+            Class<? extends Function> functionClass =
+                ElasticSearchSinkConnectorConfig.this.getClass(DOC_ID_GETTER_CLASS_CONFIG).asSubclass(Function.class);
+
+            if (functionClass != null) {
+                rv = Optional.of(functionClass.newInstance());
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return rv;
+    });
+
+    public Optional<Function<SinkRecord, String>> getDocIdSupplier() { return docIdGetter.get(); }
 }

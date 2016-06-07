@@ -2,8 +2,12 @@ package org.apache.kafka.connect.es.consumer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.kafka.connect.es.config.ElasticSearchSinkConnectorConfig;
+import org.apache.kafka.connect.sink.SinkRecord;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.client.Requests;
 
@@ -27,7 +31,9 @@ public class DeleteConsumer extends AbstractConsumer {
     }
 
     @Override
-    protected boolean addRequestToBulkProcessor(BulkProcessor processor, byte[] data) {
+    protected boolean addRequestToBulkProcessor(
+        BulkProcessor processor, byte[] data, Optional<String> docId)
+    {
         boolean successful = false;
 
         JsonNode tree = null;

@@ -49,12 +49,16 @@ public class ElasticSearchSinkTask extends SinkTask {
     }
 
     @Override
-    public void put(Collection<SinkRecord> records) {
-        if (consumer != null) {
+    public void put(Collection<SinkRecord> records)
+    {
+        if (consumer != null)
+        {
             int count = 0;
-            for (SinkRecord record : records) {
+            for (SinkRecord record : records)
+            {
                 boolean processed = consumer.process(record);
-                if (processed) {
+                if (processed)
+                {
                     count++;
                 }
             }
